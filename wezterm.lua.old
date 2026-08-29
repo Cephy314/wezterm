@@ -1,0 +1,96 @@
+local wezterm = require("wezterm") ---@type Wezterm
+local config = wezterm.config_builder()
+local session = wezterm.plugin.require("https://github.com/abidibo/wezterm-sessions")
+local act = wezterm.action
+config.initial_cols = 124
+config.initial_rows = 48
+-- config.font_size = 14
+-- Colors and Theme
+config.color_scheme = "teide_dark"
+config.use_fancy_tab_bar = true
+config.hide_tab_bar_if_only_one_tab = false
+config.window_background_gradient = {
+	orientation = "Vertical",
+	colors = { "#1D2228", "#161a1e" },
+	interpolation = "CatmullRom",
+	blend = "Oklab",
+}
+config.bold_brightens_ansi_colors = "BrightAndBold"
+config.font = wezterm.font_with_fallback({
+	{
+		family = "MonoLisa Variable",
+		weight = "Medium",
+		harfbuzz_features = { "calt", "liga", "ss02", "ss07", "ss09", "ss11", "ss13" },
+	},
+	{
+		family = "CaskaydiaCove Nerd Font Mono",
+		weight = "Medium",
+		harfbuzz_features = { "calt", "liga", "ss02", "ss20" },
+	},
+})
+
+-- -- Keys! Let's add some functionality.
+-- config.keys = {
+-- 	{ -- Rename Current Workspace
+-- 		key = "$",
+-- 		mods = "CTRL|SHIFT",
+-- 		action = act.PromptInputLine({
+-- 			description = "Enter new workspace name",
+-- 			action = wezterm.action_callback(function(_, _, line)
+-- 				if line then
+-- 					wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), line)
+-- 				end
+-- 			end),
+-- 		}),
+-- 	},
+-- 	{ -- Create New Workspace
+-- 		key = "w",
+-- 		mods = "CTRL|SHIFT",
+-- 		action = act.PromptInputLine({
+-- 			description = wezterm.format({
+-- 				{ Attribute = { Intensity = "Bold" } },
+-- 				{ Foreground = { AnsiColor = "Fuchsia" } },
+-- 				{ Text = "Enter Name for New Workspace: " },
+-- 			}),
+-- 			action = wezterm.action_callback(function(window, pane, line)
+-- 				if line then
+-- 					window:perform_action(
+-- 						act.SwitchToWorkspace({
+-- 							name = line,
+-- 						}),
+-- 						pane
+-- 					)
+-- 				end
+-- 			end),
+-- 		}),
+-- 	},
+-- }
+
+session.apply_to_config(config, {
+	-- Auto-save interval in seconds (default: 30)
+	auto_save_interval = 60,
+	-- Warn when git branches changed on restore (default: true)
+	git_branch_warn = true,
+})
+-- Do this OS stuff after everything else to allow us to override defaults.
+--
+-- Handle windows specific items.
+if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+	wezterm.log_info("Detected Windows!")
+	-- We use EndeavourOS in WSL so lets specify that as our domain.
+	config.default_domain = "WSL:EndeavourOS"
+	-- config.default_prog = { "pwsh" }
+	config.font_size = 14
+end
+
+if wezterm.target_triple == "aarch64-apple-darwin" or wezterm.target_triple == "x86_64-apple-darwin" then
+	-- We are on darwin! Might use non standard font sizes cause its a smaller monitor.
+	config.dpi = 144.0
+	config.font_size = 12.5
+end
+
+if wezterm.target_triple == "x86_64-unknown-linux-gnu" then
+	-- Handle any raw linux things.
+end
+
+return config
