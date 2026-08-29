@@ -1,6 +1,12 @@
+local platform = require('utils.platform')
+
+   if platform.is_win then
+     default_domain = "wsl:EndeavourOS"
+   end
 ---@type Config
 return {
    -- behaviours
+   default_domain = default_domain,
    automatically_reload_config = true,
    exit_behavior = 'CloseOnCleanExit', -- if the shell program exited with a successful status
    exit_behavior_messaging = 'Verbose',
