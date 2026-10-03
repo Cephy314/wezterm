@@ -1,7 +1,7 @@
 local platform = require('utils.platform')
 
    if platform.is_win then
-     default_domain = "wsl:EndeavourOS"
+     default_domain = "local"
    end
 ---@type Config
 return {
